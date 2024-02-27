@@ -23,15 +23,17 @@ PS> .\check_windows_files.ps1 -checkPath C:\\Monitoring\\MyDir\\somelogfile.log 
 
 param (
     [Parameter(Mandatory=$true)][string]$checkPath,
+    [Parameter(Mandatory=$false)][string]$dateTimeFormat,
     [Parameter(Mandatory=$true)][float]$startTime,
-    [Parameter(Mandatory=$true)][float]$EndTime,
+    [Parameter(Mandatory=$true)][float]$endTime,
+    [Parameter(Mandatory=$false)][string]$filename,
+    
     
     [Parameter(Mandatory=$false,ParameterSetName='exists')][switch]$exists,
     [Parameter(Mandatory=$false,ParameterSetName='exists')][switch]$shouldnotexist,
 
 
-    [Parameter(Mandatory=$false)][switch]$today,
-    [Parameter(Mandatory=$false)][string]$extension
+    [Parameter(Mandatory=$false)][switch]$today
 
 )
 
@@ -56,59 +58,81 @@ function sanitizePath {
 
 function checkFileExists {
     param (
-        [Parameter(Mandatory=$true)][string]$Path
+        [Parameter(Mandatory=$true)][string]$path,
+        [Parameter(Mandatory=$false)][string]$formattedDateTime,
+        [Parameter(Mandatory=$true)][string]$remainingFilename
     )
 
     $returnBool = $false
 
+    foreach ($extension in $fileExtensions) {
+    $tempPath = "$path\\$formattedDateTime$remainingFilename$extension"
+    Write-Host "File extension: $tempPath"
     if (Get-CimInstance -ClassName CIM_LogicalFile `
-        -Filter "Name='$Path'" `
+        -Filter "Name='$tempPath'" `
         -KeyOnly `
         -Namespace root\cimv2) {
 
         $returnBool = $true
 
-    }
+    }}
 
     return $returnBool
 }
 
-
 ## MAIN SCRIPT ##
+##possible file extensions array
+$fileExtensions = @(
+    ".txt",
+    ".doc",
+    ".docx",
+    ".pdf",
+    ".jpg",
+    ".png",
+    ".xlsx",
+    ".csv",
+    ".mp3",
+    ".mp4",
+    ".html",
+    ".xml",
+    ".json",
+    ".zip",
+    ".rar"
+    # Add more extensions as needed
+)
 #Set the date and times  
 $currentDate = Get-Date
 $formattedTime = $currentDate.ToString("HH.mm")/1
-$formattedDate = $currentDate.ToString("dd_MM_yyyy")
 
-#check if command wants to check for a file that is todays date
+Write-Host "$checkpath$formattedDate"
+
 If ($today -eq $true){
-    $checkPath = $checkPath+"\\"+$formattedDate+$extension
+    $formattedDate = $currentDate.ToString($dateTimeFormat)
 }
-
 #check if the current time is between the start and end times
-If ($formattedTime -ge $startTime -and $formattedTime -le $EndTime)
+If ($formattedTime -ge $startTime -and $formattedTime -le $endTime)
 {
     #confirm that the current time is applicable
     Write-Output "$formattedTime time is between $startTime and $EndTime"
     #check if the file exists
     if ($exists -eq $true) {
-    if (checkFileExists -Path $checkPath) {
+    if (checkFileExists -path $checkpath -formattedDateTime $formattedDate -remainingFilename $filename) {
         if ($shouldnotexist -eq $true) {
-            $exitMessage = "CRITICAL: I found the file $checkPath, and it shouldn't exist!"
+            $exitMessage = "CRITICAL: I found the file $checkpath\\$formattedDate$filename, and it shouldn't exist!"
             $exitCode = 2
         }
         else {
-            $exitMessage = "OK: I found the file $checkPath"
+            $exitMessage = "OK: I found the file $checkpath\\$formattedDate$filename"
             $exitCode = 0
         }
     }
     else {
         if ($shouldnotexist -eq $true) {
-            $exitMessage = "OK: I did not find the file $checkpath, and it shouldn't exist."
+            $exitMessage = "OK: I did not find the file $checkpath\\$formattedDate$filename, and it shouldn't exist."
             $exitCode = 0
         }
         else {
-            $exitMessage = "CRITICAL: I did not find the file, $checkPath"
+            $exitMessage = "CRITICAL: I did not find the file, $checkpath\\$formattedDate$filename"
             $exitCode = 2
         }
     }
