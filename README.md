@@ -1,42 +1,39 @@
-<#
-.DESCRIPTION<br>
-Check Windows Files Today Date Time<br>
-This is a PowerShell-based plugin for Nagios and Nagios-Like systems. This plugin can check and report on the following:<br>
-- Check if a file exists between specific times.<br>
+```markdown
+# Check Windows Files Today Date Time
 
-.EXAMPLE<br>
-.\check_windows_files_tdt.ps1 -checkPath C:\\directory\\filename.extension -startTime 8.00 -endTime 18.00 -exists<br>
-If you wish to check all the time, then set the times as 0.00 and 24.00 as it uses a 24-hour clock.<br>
-If you wish to check for a file that contains today's date, then only give the filepath to the folder you're looking in and add the -today switch and the extension type.<br>
+This is a PowerShell-based plugin for Nagios and Nagios-like systems. This plugin can check and report on the following:
 
-.EXAMPLE<br>
-.\check_windows_files_tdt.ps1 -checkPath C:\\directory -startTime 8.00 -endTime 18.00 -exists -today -ext .txt<br>
+- Check if a file exists between specific times.
 
-.NOTES<br>
-This plugin currently does not have a helper function to work with directories. Currently, you need to have two backslashes in your directory paths (e.g., C:\\Monitoring\\MyDir\\).<br>
+## Examples
 
-.PARAMETER checkPath<br>
-The path to the file or directory you wish to monitor. This is needed for all types of checks performed by the plugin.<br>
+Check if a file exists between specific times:
 
-.PARAMETER startTime<br>
-The time you wish to start checking for the file. This is needed for the time-based checks.<br>
+```powershell
+.\check_windows_files_tdt.ps1 -checkPath C:\\directory\\filename.extension -startTime 8.00 -endTime 18.00 -exists
+```
 
-.PARAMETER endTime<br>
-The time you wish to stop checking for the file. This is needed for the time-based checks.<br>
+If you wish to check all the time then set the times as 0.00 and 24.00 as it uses a 24-hour clock.
 
-.PARAMETER exists<br>
-The file specified should exist. If it does not, throw a CRITICAL.<br>
+If you wish to check for a file that contains today's date then only give the filepath to the folder you're looking in and you must add the `-today` switch and the extension type:
 
-.PARAMETER shouldnotexist<br>
-The file specified should not exist. If it does, throw a CRITICAL.<br>
+```powershell
+.\check_windows_files_tdt.ps1 -checkPath C:\\directory -startTime 8.00 -endTime 18.00 -exists -today -ext .txt
+```
 
-.PARAMETER today<br>
-This switch is used to check for files that contain today's date. This is needed for the time-based checks.<br>
+## Notes
 
-.PARAMETER ext<br>
-The file extension you wish to check for. This is needed for the time-based checks.<br>
+This plugin currently does not have a helper function to work with directories. Currently, you need to have two backslashes in your directory paths. E.g. `C:\\Monitoring\\MyDir\\`.
 
-.EXAMPLE<br>
-PS> .\check_windows_files.ps1 -checkPath C:\\Monitoring\\MyDir\\somelogfile.log -exists<br>
-#>
+## Parameters
 
+- `checkPath`: The path to the file or directory you wish to monitor. This is needed for all types of checks performed by the plugin.
+- `exists`: The file specified should exist. If it does not, throw a CRITICAL.
+- `shouldnotexist`: The file specified should not exist. If it does, throw a CRITICAL.
+
+## Example
+
+```powershell
+PS> .\check_windows_files.ps1 -checkPath C:\\Monitoring\\MyDir\\somelogfile.log -exists
+```
+```
