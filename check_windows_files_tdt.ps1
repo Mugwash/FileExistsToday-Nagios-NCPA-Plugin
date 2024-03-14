@@ -33,8 +33,8 @@ param (
     [Parameter(Mandatory=$false,ParameterSetName='exists')][switch]$shouldnotexist,
 
 
-    [Parameter(Mandatory=$false)][switch]$today
-
+    [Parameter(Mandatory=$false)][switch]$today,
+    [Parameter(Mandatory=$false)][int]$var_day
 )
 
 #Setting global error action preference
@@ -60,7 +60,7 @@ function checkFileExists {
     param (
         [Parameter(Mandatory=$true)][string]$path,
         [Parameter(Mandatory=$false)][string]$formattedDateTime,
-        [Parameter(Mandatory=$true)][string]$remainingFilename
+        [Parameter(Mandatory=$false)][string]$remainingFilename
     )
 
     $returnBool = $false
@@ -103,9 +103,9 @@ $fileExtensions = @(
 #Set the date and times  
 $currentDate = Get-Date
 $formattedTime = $currentDate.ToString("HH.mm")/1
-
-Write-Host "$checkpath$formattedDate"
-
+$formattedDate = $currentDate.AddDays($var_day).ToString($dateTimeFormat)
+write-host "Formatted Date: $formattedDate"
+#check if the user has specified the -today switch
 If ($today -eq $true){
     $formattedDate = $currentDate.ToString($dateTimeFormat)
 }
